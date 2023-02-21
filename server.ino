@@ -14,6 +14,25 @@ Clients* FILIP_PC;
 
 ClientManager* manager;
 
+void mess(const MqttClient* client , const Topic& topic, const char* payload, size_t length ){
+    // DO SOMETHING
+    Serial.print("#############");
+
+    Serial.print((unsigned int)client, HEX);
+    Serial.print("   :::   ");
+    Serial.print((unsigned int)server -> getClient(), HEX);
+    Serial.print("   :::   ");
+    Serial.print((client -> id()).c_str());
+    Serial.print("   :::   ");
+    Serial.print((server -> getClient() -> id()).c_str());
+    Serial.print("   ");
+    
+    Serial.println("#############");
+
+    manager -> findClients(client, topic.c_str(), payload);
+    
+}
+
 void setup(){
 	// ESP32 communication and memory
 	Serial.begin(115200);
@@ -27,19 +46,22 @@ void setup(){
 
 	// Create clients
 	server 		= new Clients(wifi -> getLocalIP_string(), broker -> getPORT(), String("server"));
-	FILIP_PC 	= new Clients(wifi -> getLocalIP_string(), broker -> getPORT(), String("FILIP_PC"));
+	//FILIP_PC 	= new Clients(wifi -> getLocalIP_string(), broker -> getPORT(), String("FILIP_PC"));
 
 	server 		-> setMAC_ADDR("00:30:05:ab:77:6a");
-	FILIP_PC 	-> setMAC_ADDR("b4:2e:99:c9:72:a0");
+	//FILIP_PC 	-> setMAC_ADDR("b4:2e:99:c9:72:a0");
 
 	server 		-> addTopic("main/server");
-	FILIP_PC 	-> addTopic("main/FILIP_PC");
+	//FILIP_PC 	-> addTopic("main/FILIP_PC");
 
 	// Create client manager
 	manager 	= new ClientManager();
-	
-	manager -> addClient(server);
-	manager -> addClient(FILIP_PC);
+
+    manager -> addClient(server);
+	//manager -> addClient(FILIP_PC);
+
+	//server -> getClient() -> setCallback(mess);
+    manager -> setCallbacks(mess);
 }
 
 void loop(){

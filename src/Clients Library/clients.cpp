@@ -1,33 +1,7 @@
 #include "clients.hpp"
 
-Clients* Clients::pointer 			= NULL;
-
 char Clients::START_MESSAGE[128] 	= "start";
 char Clients::STOP_MESSAGE[128] 	= "stop";
-
-void Clients::receiveMessage(const MqttClient*/*src*/, const Topic& topic, 
-						const char* payload, size_t /*length*/){
-	// DO SOMETHING
-	#ifdef DEBUG
-		Serial.println("New message with topic: " + String(topic.c_str()));
-		Serial.println("Client " + Clients::getPointer() -> getName() + " is processing message \"" + String(payload) + "\"\n");
-	#endif
-
-	char* message = (char*) malloc(sizeof(char) * 128);
-	toLowercase(payload, message);
-
-	if(!strcmp(message, Clients::getStartMessage())){
-		#ifdef DEBUG
-			Serial.println("\t # Waking up: " + Clients::getPointer() -> getMAC_ADDR());
-		#endif
-		Clients::getPointer() -> wakeUP();
-	}else if(!strcmp(message, Clients::getStopMessage())){
-		#ifdef DEBUG
-			Serial.println("\t # Putting to sleep: " + Clients::getPointer() -> getName());
-		#endif
-		Clients::getPointer() -> sleep();
-	}
-}
 
 void toLowercase(const char* payload, char* message){
 	int i = 0;
@@ -45,7 +19,7 @@ void toLowercase(const char* payload, char* message){
 }
 
 Clients::Clients(String SERVER_IP_ADDR, int SERVER_PORT, String name){
-	this -> client 				= new MqttClient();
+	this -> client 				= new MqttClient(name.c_str());
 	this -> TOPIC 				= NULL;
 	this -> SERVER_PORT 		= 1883;
 	this -> SERVER_IP_ADDR[0] 	= '\0';
@@ -58,12 +32,9 @@ Clients::Clients(String SERVER_IP_ADDR, int SERVER_PORT, String name){
 		Serial.println("Created client: " + String(this -> name));
 	#endif
 
-	this -> updatePointer();
 	this -> client -> connect(this -> SERVER_IP_ADDR, this -> SERVER_PORT);
-		
-	this -> client -> setCallback(Clients::receiveMessage);
-	this -> addTopic("main");
 
+	this -> addTopic("main");
 }
 
 void Clients::addTopic(char* TOPIC){

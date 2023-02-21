@@ -23,7 +23,6 @@ protected:
 	};
 	typedef struct topic_struct TOPICS;
 
-	static Clients* pointer;
 	MqttClient* client;
 
 	char 	SERVER_IP_ADDR[16];
@@ -33,27 +32,13 @@ protected:
 	TOPICS* TOPIC;
 
 	void sleep();
-	void reconnect() { 
-		this -> client -> connect(this -> SERVER_IP_ADDR, this -> SERVER_PORT); 
-		this -> client -> setCallback(Clients::receiveMessage);
-	}
+	void reconnect() { this -> client -> connect(this -> SERVER_IP_ADDR, this -> SERVER_PORT); }
 
-	MqttClient* getClient() { 
-		this -> updatePointer();
-		return this -> client; 
-	}
-	void 			updatePointer() 	{ pointer = this; }
-	static Clients* getPointer() 		{ return pointer; }
 	static char*	getStartMessage() 	{ return START_MESSAGE; }
 	static char*	getStopMessage() 	{ return STOP_MESSAGE; }
 
-	static void receiveMessage(const MqttClient*,const Topic& topic, 
-						const char* payload, size_t /*length*/);
-
 public:
 	Clients(String SERVER_IP_ADDR="", int SERVER_PORT=1883, String name="test");
-//	void receiveMessage(const MqttClient* /*source*/, const Topic& topic, 
-//						const char* payload, size_t /*length*/);
 
 	void addTopic(char* TOPIC);
 	void sendMessage(char* topic, char* message);
@@ -61,6 +46,8 @@ public:
 	void setMAC_ADDR(char* MAC_ADDR) override;
 
 	String getName() {return String(this -> name); }
+
+	MqttClient* getClient() { return this -> client; }
 };
 
 #endif
