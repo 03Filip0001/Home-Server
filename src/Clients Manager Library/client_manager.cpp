@@ -2,19 +2,36 @@
 
 using CM = ClientManager;
 
+void toLowercase(const char* payload, char* message){
+	int i = 0;
+	while(i < 127 && payload[i] != '\0'){
+		if(payload[i] >= 'A' && payload[i] <= 'Z') {
+			message[i] = payload[i] + ('a' - 'A');
+		}else{
+			message[i] = payload[i];
+		}
+
+		i++;
+	}
+
+	message[i] = '\0';
+}
+
 void CM::cicleClients(const char* id, const char* payload, char all){
 	Manager* manager = this -> manager;
+	char message[128] = "";
+	toLowercase(payload, message);
 
 	while(manager != NULL){
-		if(all && !strcmp(payload, manager -> client -> getStartMessage())){
+		if(all && !strcmp(message, manager -> client -> getStartMessage())){
 			manager -> client -> wakeUP();
-		}else if(all && !strcmp(payload, manager -> client -> getStopMessage())){
+		}else if(all && !strcmp(message, manager -> client -> getStopMessage())){
 			manager -> client -> sleep();
 		}else if(!all){
 			if(!strcmp((manager -> client -> getClient() -> id()).c_str()	, id)){
-				if(!strcmp(payload, manager -> client -> getStartMessage())){
+				if(!strcmp(message, manager -> client -> getStartMessage())){
 					manager -> client -> wakeUP();
-				}else if(!strcmp(payload, manager -> client -> getStopMessage())){
+				}else if(!strcmp(message, manager -> client -> getStopMessage())){
 					manager -> client -> sleep();
 				}
 			}

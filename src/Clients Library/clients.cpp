@@ -3,21 +3,6 @@
 char Clients::START_MESSAGE[128] 	= "start";
 char Clients::STOP_MESSAGE[128] 	= "stop";
 
-void toLowercase(const char* payload, char* message){
-	int i = 0;
-	while(i < 127 && payload[i] != '\0'){
-		if(payload[i] >= 'A' && payload[i] <= 'Z') {
-			message[i] = payload[i] + ('a' - 'A');
-		}else{
-			message[i] = payload[i];
-		}
-
-		i++;
-	}
-
-	message[i] = '\0';
-}
-
 Clients::Clients(String SERVER_IP_ADDR, int SERVER_PORT, String name){
 	this -> client 				= new MqttClient(name.c_str());
 	this -> TOPIC 				= NULL;
@@ -72,5 +57,7 @@ void Clients::setMAC_ADDR(char* MAC_ADDR) {
 }
 
 void Clients::sleep(){
+	Serial.println("Putting machine down to sleep with MAC address: " + String(MAC_ADDR));
+
 	this -> client -> publish(this -> getName().c_str(), "stop");
 }

@@ -9,4 +9,6 @@
 #include "./src/Clients Library/clients.hpp"
 #include "./src/Clients Manager Library/client_manager.hpp"
 
+#include "./src/DDNS/ddns.hpp"
+
 #endif
